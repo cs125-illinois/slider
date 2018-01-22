@@ -1,3 +1,4 @@
+require('dotenv').config()
 /*
   This is the SocketCluster master controller file.
   It is responsible for bootstrapping the SocketCluster master process.
@@ -45,7 +46,8 @@ var options = {
   crashWorkerOnError: argv['auto-reboot'] != false,
   // If using nodemon, set this to true, and make sure that environment is 'dev'.
   killMasterOnSignal: false,
-  environment: environment
+  environment: environment,
+  path: "/slider/"
 };
 
 var bootTimeout = Number(process.env.SOCKETCLUSTER_CONTROLLER_BOOT_TIMEOUT) || 10000;
