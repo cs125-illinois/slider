@@ -2,6 +2,11 @@ require('dotenv').config()
 const SocketWorker = require('socketcluster/scworker')
 const _ = require('lodash')
 
+const express = require('express')
+const serveStatic = require('serve-static')
+const path = require('path')
+const fs = require('fs')
+
 const mongo = require('mongodb').MongoClient
 const expect = require('chai').expect
 const bunyan = require('bunyan')
@@ -68,6 +73,17 @@ class Slider extends SocketWorker {
     }
   }
   run () {
+    let app = express()
+    app.use(serveStatic(path.resolve(__dirname, 'dist')));
+    app.use(serveStatic(path.resolve(__dirname, 'public')));
+    _.each(fs.readdirSync(path.resolve(__dirname, 'dist')), filename => {
+      let components = filename.split('.')
+      app.get(`${ components[0] }.${ components[2] }`, (req, res) => {
+        res.redirect(302, filename)
+      })
+    })
+    this.httpServer.on('request', app)
+
     this.scServer.on('connection', (socket) => {
       socket.on('login', (token, respond) => {
         return this.login(token, respond, socket)
