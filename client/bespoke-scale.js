@@ -30,6 +30,7 @@ module.exports = function(options) {
         if (!($(slide).hasClass('nozoom'))) {
           $(wrapper).css(transformProperty, `scale(${ ratio })`)
         } else {
+          $(wrapper).css(transformProperty, `scale(1.0)`)
           let newWidth = Math.round(slideWidth * ratio)
           let newHeight = Math.round(slideHeight * ratio)
           if (!($(slide).attr('data-font-size'))) {
@@ -45,7 +46,7 @@ module.exports = function(options) {
         }
       })
     }
-    window.addEventListener('resize', scaleAll);
-    scaleAll();
+    window.addEventListener('resize', scaleAll)
+    scaleAll()
   }
 }

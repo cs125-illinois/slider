@@ -5,13 +5,13 @@ const bespoke = require('./bespoke.js')
 const scale = require('./bespoke-scale.js')
 const janini = require('./bespoke-janini.js')
 
+const overview = require('bespoke-overview')
 const classes = require('bespoke-classes')
 const nav = require('bespoke-nav')
 const bullets = require('bespoke-bullets')
 const hash = require('bespoke-hash')
 const extern = require('bespoke-extern')
 const fullscreen = require('bespoke-fullscreen')
-const overview = require('bespoke-overview')
 const forms = require('bespoke-forms')
 
 highlightJS = require('highlight.js')
@@ -27,11 +27,11 @@ bespoke.from({
   classes(),
   nav(),
   scale('transform'),
+  overview(),
   bullets('.bullet'),
   hash(),
   extern(bespoke),
   fullscreen(),
-  overview(),
   forms(),
   janini()
 ])

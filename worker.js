@@ -76,11 +76,25 @@ class Slider extends SocketWorker {
     let app = express()
     app.use(serveStatic(path.resolve(__dirname, 'dist')));
     app.use(serveStatic(path.resolve(__dirname, 'public')));
-    _.each(fs.readdirSync(path.resolve(__dirname, 'dist')), filename => {
-      let components = filename.split('.')
-      app.get(`${ components[0] }.${ components[2] }`, (req, res) => {
-        res.redirect(302, filename)
+    let mapping = {}
+    let loadMapping = () => {
+      _.each(fs.readdirSync(path.resolve(__dirname, 'dist')), filename => {
+        let components = filename.split('.')
+        mapping[`/${ components[0] }.${ components[2] }`] = filename
       })
+    }
+    loadMapping()
+    app.use((req, res, next) => {
+      if (req.url in mapping) {
+        res.redirect(302, mapping[req.url])
+        return
+      }
+      loadMapping()
+      if (req.url in mapping) {
+        res.redirect(302, mapping[req.url])
+        return
+      }
+      return next()
     })
     this.httpServer.on('request', app)
 

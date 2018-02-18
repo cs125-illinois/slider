@@ -20,6 +20,7 @@
     "bespoke-nav": "^1.0.2",
     "bespoke-overview": "^1.0.5",
     "bootstrap": "^4.0.0",
+    "build-if-changed": "^0.1.2",
     "bunyan": "^1.8.12",
     "bunyan-prettystream": "^0.1.3",
     "chai": "^4.1.2",
@@ -37,7 +38,9 @@
     "minimist": "1.1.0",
     "moment": "^2.20.1",
     "mongodb": "^3.0.1",
+    "node-sass": "^4.7.2",
     "popper.js": "^1.12.9",
+    "sass-loader": "^6.0.6",
     "sc-errors": "~1.3.3",
     "sc-hot-reboot": "~1.0.0",
     "scc-broker-client": "~2.1.2",
@@ -45,10 +48,12 @@
     "socketcluster": "~9.3.1",
     "socketcluster-client": "~9.0.2",
     "split.js": "^1.3.5",
+    "uglifyjs-webpack-plugin": "^1.2.0",
     "webpack": "^3.11.0",
     "webpack-cleanup-plugin": "^0.5.1"
   },
   "scripts": {
+    "build": "build-if-changed",
     "webpack": "webpack",
     "start": "node server.js",
     "start:docker": "node dockerwait.js && node ${SOCKETCLUSTER_MASTER_CONTROLLER:-server.js}"

@@ -1,0 +1,6 @@
+[npm i && npm prune]
+./package.json
+
+[npm run webpack]
+./client/**/*
+./package.json
