@@ -36,13 +36,8 @@ module.exports = () => {
       toggleMenu(false)
     })
 
-    let forceShow = false
     let updateLogin = (show) => {
       if (deck.authenticated) {
-        if (forceShow) {
-          toggleMenu(false)
-          forceShow = false
-        }
         $('nav #login').hide()
         $('nav #logout').show()
         $('nav #login').tooltip('hide')

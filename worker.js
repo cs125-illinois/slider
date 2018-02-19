@@ -71,7 +71,8 @@ class Slider extends SocketWorker {
       let payload = login.getPayload()
       expect(payload.hd).to.equal('illinois.edu')
       socket.setAuthToken({
-        email: payload.email
+        email: payload.email,
+        presenter: (payload.email === 'challen@illinois.edu')
       })
       return respond()
     } catch (err) {

@@ -147,16 +147,17 @@ module.exports.from = (opts, plugins) => {
     })
     deck.socket.on('authenticate', () => {
       deck.authenticated = true
-      fire('login', {
-        email: user.getBasicProfile().getEmail()
-      })
+      fire('login', deck.socket.getAuthToken())
       $("#badEmailModal").modal('hide')
     })
     deck.socket.on('deauthenticate', () => {
       fire('logout', {
         email: user.getBasicProfile().getEmail()
       })
-      $("#cornerSignin").show()
+    })
+    deck.socket.on('user', (payload, respond) => {
+      deck.user = payload
+      return respond()
     })
     deck.socket.on('error', (err) => {
       console.error(err)
