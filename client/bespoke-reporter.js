@@ -1,0 +1,22 @@
+module.exports = () => {
+  return (deck) => {
+    let reportedSlide
+    let currentSlide
+    let reportChange = () => {
+      if (deck.socket && currentSlide != reportedSlide) {
+        deck.socket.emit('reporter', {
+          deckID: deck.id,
+          slideID: currentSlide
+        })
+        reportedSlide = currentSlide
+      }
+    }
+    deck.on('activate', slideData => {
+      currentSlide = slideData.slideID
+      reportChange()
+    })
+    deck.on('login', () => {
+      reportChange()
+    })
+  }
+}

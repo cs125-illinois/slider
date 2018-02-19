@@ -2,6 +2,7 @@ require('jquery')
 require('bootstrap')
 
 const bespoke = require('./bespoke.js')
+const reporter = require('./bespoke-reporter.js')
 const scale = require('./bespoke-scale.js')
 const janini = require('./bespoke-janini.js')
 const overview = require('./bespoke-overview.js')
@@ -24,6 +25,7 @@ bespoke.from({
   parent: 'article.deck',
   slides: 'div.sect1'
 }, [
+  reporter(),
   classes(),
   nav(),
   scale('transform'),

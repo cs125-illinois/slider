@@ -51,8 +51,12 @@ var client = new OAuth2Client(process.env.GOOGLE, '', '');
 const fileWatcher = require('filewatcher')
 const distWatcher = fileWatcher()
 
-let sliderChanges
 class Slider extends SocketWorker {
+  constructor(db) {
+    super()
+    this.db = db
+    this.sliderChanges = db.collection('sliderChanges')
+  }
   async login (info, respond, socket) {
     try {
       var login = await client.verifyIdToken({
@@ -75,7 +79,24 @@ class Slider extends SocketWorker {
       return respond('Please log in with your @illinois.edu email address')
     }
   }
-  run () {
+  async reporter(currentSlide, respond, socket) {
+    let authToken = socket.getAuthToken()
+    if (!(authToken)) {
+      log.warn(`authentication required`)
+      return respond('authentication required')
+    }
+
+    currentSlide.email = authToken.email
+    currentSlide.timestamp = moment().toDate()
+    currentSlide.address = socket.remoteAddress
+    currentSlide.socketID = socket.id
+
+    log.debug(currentSlide)
+    this.sliderChanges.insert(currentSlide)
+
+    return respond()
+  }
+  async run () {
     let app = express()
     let mapping = {}
     let loadMapping = () => {
@@ -106,17 +127,8 @@ class Slider extends SocketWorker {
       socket.on('login', (token, respond) => {
         return this.login(token, respond, socket)
       })
-      socket.on('slideChange', (currentSlide, respond) => {
-        let authToken = socket.getAuthToken()
-        if (!(authToken)) {
-          log.warn(`authentication required`)
-          return respond('authentication required')
-        }
-        currentSlide.email = authToken.email
-        currentSlide.timestamp = moment().toDate()
-        log.debug(currentSlide)
-        sliderChanges.insert(currentSlide)
-        return respond()
+      socket.on('reporter', (payload, respond) => {
+        return this.reporter(payload, respond, socket)
       })
     })
   }
@@ -124,6 +136,5 @@ class Slider extends SocketWorker {
 
 mongo.connect(process.env.MONGO)
   .then(client => {
-    sliderChanges = client.db('Spring2018').collection('sliderChanges')
-    new Slider()
+    new Slider(client.db('Spring2018'))
   })

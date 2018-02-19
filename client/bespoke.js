@@ -1,7 +1,7 @@
+const $ = require('jquery')
 const socketCluster = require('socketcluster-client')
 
 module.exports.from = (opts, plugins) => {
-  const sliderID = $('meta[name="slider-id"]').attr('content').trim()
   let parent = (opts.parent || opts).nodeType === 1 ?
     (opts.parent || opts) :
     document.querySelector(opts.parent || opts)
@@ -13,7 +13,6 @@ module.exports.from = (opts, plugins) => {
   let activeSlide = slides[0]
   let listeners = {}
   let slideID
-  let socket = false
 
   let activate = function(index, customData) {
     if (!slides[index]) {
@@ -24,13 +23,6 @@ module.exports.from = (opts, plugins) => {
     activeSlide = slides[index]
     let slideData = createEventData(activeSlide, customData)
     fire('activate', slideData)
-    if (socket && slideData.slideID != slideID) {
-      slideID = slideData.slideID
-      socket.emit('slideChange', {
-        deckID: sliderID,
-        slideID: slideID
-      })
-    }
   }
 
   let slide = function(index, customData) {
@@ -75,7 +67,7 @@ module.exports.from = (opts, plugins) => {
   }
 
   let deck = {
-    id: sliderID,
+    id: $('meta[name="slider-id"]').attr('content').trim(),
     on: on,
     off: off,
     fire: fire,
@@ -87,9 +79,8 @@ module.exports.from = (opts, plugins) => {
   };
 
   (plugins || []).forEach((plugin) => {
-    plugin(deck);
+    plugin(deck)
   })
-
   activate(0)
 
   let user
@@ -110,9 +101,9 @@ module.exports.from = (opts, plugins) => {
     }
 
     let token = user.getAuthResponse().id_token
-    if (socket) {
-      socket.emit('login', {
-        sliderID: sliderID,
+    if (deck.socket) {
+      deck.socket.emit('login', {
+        sliderID: deck.id,
         token: token
       }, function (err) {
         if (err) {
@@ -122,16 +113,19 @@ module.exports.from = (opts, plugins) => {
       })
       return
     }
-    socket = socketCluster.connect({
+    let link = document.createElement('a')
+    link.setAttribute('href', $(parent).attr('data-slider'))
+
+    deck.socket = socketCluster.connect({
       path: '/slider/',
-      hostname: 'cs125-reporting.cs.illinois.edu',
-      port: 443,
-      secure: true
+      hostname: link.hostname,
+      port: link.port,
+      secure: (link.port === 443)
     })
-    socket.on('connect', status => {
+    deck.socket.on('connect', status => {
       if (!(status.isAuthenticated)) {
-        socket.emit('login', {
-          sliderID: sliderID,
+        deck.socket.emit('login', {
+          sliderID: deck.id,
           token: token
         }, function (err) {
           if (err) {
@@ -141,21 +135,20 @@ module.exports.from = (opts, plugins) => {
         })
       }
     })
-    socket.on('authenticate', () => {
+    deck.socket.on('authenticate', () => {
       fire('login', {
-        socket: socket,
         email: user.getBasicProfile().getEmail()
       })
       $("#badEmailModal").modal('hide')
       $("#cornerSignin").hide()
     })
-    socket.on('deauthenticate', () => {
+    deck.socket.on('deauthenticate', () => {
       fire('logout', {
         email: user.getBasicProfile().getEmail()
       })
       $("#cornerSignin").show()
     })
-    socket.on('error', (err) => {
+    deck.socket.on('error', (err) => {
       console.error(err)
     })
   }
