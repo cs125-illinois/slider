@@ -2,8 +2,9 @@ const $ = require('jquery')
 
 module.exports = () => {
   return (deck) => {
-    let KEY_M = 77
-    let EVT_KEYDOWN = 'keydown'
+    let isModifierPressed = e => {
+      return !!(e.ctrlKey || e.shiftKey || e.altKey || e.metaKey);
+    }
 
     let toggleMenu = (show) => {
       show = show !== undefined ? show : $('nav').css('display') === 'none'
@@ -14,21 +15,55 @@ module.exports = () => {
       }
       deck.fire('should-scale')
     }
-
-    let isModifierPressed = e => {
-      return !!(e.ctrlKey || e.shiftKey || e.altKey || e.metaKey);
+    let toggleHelp = () => {
+      $("#helpModal").modal('toggle')
     }
-
-    let onKeydown = e => {
-      var key = e.which;
-      if (key === KEY_M && !isModifierPressed(e)) {
+    document.addEventListener('keydown', e => {
+      if (e.which === 77 && !isModifierPressed(e)) {
         toggleMenu()
+      } else if (e.which === 72 && !isModifierPressed(e)) {
+        toggleHelp()
+      }
+    })
+
+    deck.on('menu.toggle', () => {
+      toggleMenu()
+    })
+    deck.on('menu.show', () => {
+      toggleMenu(true)
+    })
+    deck.on('menu.hide', () => {
+      toggleMenu(false)
+    })
+
+    let forceShow = false
+    let updateLogin = (show) => {
+      if (deck.authenticated) {
+        if (forceShow) {
+          toggleMenu(false)
+          forceShow = false
+        }
+        $('nav #login').hide()
+        $('nav #logout').show()
+        $('nav #login').tooltip('hide')
+      } else {
+        $('nav #login').show()
+        $('nav #logout').hide()
+        if (show) {
+          toggleMenu(true)
+          $('nav #login').tooltip('show')
+        }
       }
     }
-    deck.on('menu.toggle', toggleMenu())
-    deck.on('menu.show', toggleMenu(true))
-    deck.on('menu.hide', toggleMenu(false))
-
-    document.addEventListener(EVT_KEYDOWN, onKeydown)
+    deck.on('login', () => {
+      updateLogin()
+    })
+    deck.on('nologin', () => {
+      forceShow = true
+      updateLogin(true)
+    })
+    $('nav #help').click(() => {
+      toggleHelp()
+    })
   }
 }

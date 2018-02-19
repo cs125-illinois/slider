@@ -26,6 +26,8 @@ module.exports = function(options) {
       let ratio = Math.min(deck.parent.offsetWidth / slideWidth,
         deck.parent.offsetHeight / slideHeight)
       let overview = doOverview || $('.bespoke-parent').first().hasClass('bespoke-overview')
+      let newNavWidth = Math.round(slideWidth * ratio)
+      $('nav').width(newNavWidth)
       $.each(deck.slides, (i, slide) => {
         let wrapper = $(slide).parent('.bespoke-scale-parent')
         if (!($(slide).attr('data-font-size'))) {

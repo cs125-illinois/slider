@@ -23,6 +23,7 @@ highlightJS.initHighlightingOnLoad()
 highlightJS.initLineNumbersOnLoad({ singleLine: true })
 
 $(() => {
+
   $('div.lazyiframe').each(function() {
     var iframe = $("<iframe/>")
     $.each(JSON.parse(decodeURI($(this).data('attribs'))), (name, value) => {
@@ -38,6 +39,8 @@ $(() => {
       }
     })
   })
+  $('[data-toggle="tooltip"]').tooltip()
+
   bespoke.from({
     parent: 'article',
     slides: 'div.sect1'

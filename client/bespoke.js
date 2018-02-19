@@ -1,6 +1,8 @@
 const $ = require('jquery')
 const socketCluster = require('socketcluster-client')
 
+const GOOGLE_ID = '948918026196-p399ooibc7pr0ci7ida63jb5a6n4vsik.apps.googleusercontent.com'
+
 module.exports.from = (opts, plugins) => {
   let parent = (opts.parent || opts).nodeType === 1 ?
     (opts.parent || opts) :
@@ -75,7 +77,8 @@ module.exports.from = (opts, plugins) => {
     next: step.bind(null, 1),
     prev: step.bind(null, -1),
     parent: parent,
-    slides: slides
+    slides: slides,
+    authenticated: false
   };
 
   (plugins || []).forEach((plugin) => {
@@ -83,13 +86,21 @@ module.exports.from = (opts, plugins) => {
   })
   activate(0)
 
-  let user
-  window.onSignIn = (u) => {
-    user = u
-    login()
-  }
-
-  let login = () => {
+	gapi.load('auth2', function() {
+		gapi.auth2.init({
+      client_id: GOOGLE_ID, hosted_domain: 'illinois.edu'
+    }).then(auth2 => {
+      let currentUser = auth2.currentUser.get()
+      if (currentUser.isSignedIn()) {
+        login(currentUser)
+      } else {
+        deck.fire('nologin')
+      }
+      auth2.currentUser.listen(user => { login(user) })
+      auth2.attachClickHandler($('nav #login').get(0))
+    })
+	})
+  let login = (user) => {
     if (!user) {
       $("#badEmailModal").modal('show')
       return
@@ -99,7 +110,6 @@ module.exports.from = (opts, plugins) => {
       $("#badEmailModal").modal('show')
       return
     }
-
     let token = user.getAuthResponse().id_token
     if (deck.socket) {
       deck.socket.emit('login', {
@@ -136,11 +146,11 @@ module.exports.from = (opts, plugins) => {
       }
     })
     deck.socket.on('authenticate', () => {
+      deck.authenticated = true
       fire('login', {
         email: user.getBasicProfile().getEmail()
       })
       $("#badEmailModal").modal('hide')
-      $("#cornerSignin").hide()
     })
     deck.socket.on('deauthenticate', () => {
       fire('logout', {
