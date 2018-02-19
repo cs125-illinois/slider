@@ -1,3 +1,4 @@
+require('dotenv').config()
 const webpack = require('webpack')
 const path = require('path')
 
@@ -81,7 +82,7 @@ module.exports = function (env, argv) {
       ]
     }
   }
-  if (!(env !== undefined && env.production)) {
+  if (!(process.env.ENV === 'production')) {
     config.plugins = config.plugins.filter((plugin) => plugin.constructor.name !== 'UglifyJsPlugin')
   }
   return config
