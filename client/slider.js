@@ -6,6 +6,7 @@ const reporter = require('./bespoke-reporter.js')
 const scale = require('./bespoke-scale.js')
 const janini = require('./bespoke-janini.js')
 const overview = require('./bespoke-overview.js')
+const menu = require('./bespoke-menu.js')
 
 const classes = require('bespoke-classes')
 const nav = require('bespoke-nav')
@@ -20,23 +21,6 @@ window.hljs = highlightJS
 highlightJSNumbers = require('./lib/highlightjs-line-numbers.js')
 highlightJS.initHighlightingOnLoad()
 highlightJS.initLineNumbersOnLoad({ singleLine: true })
-
-bespoke.from({
-  parent: 'article.deck',
-  slides: 'div.sect1'
-}, [
-  reporter(),
-  classes(),
-  nav(),
-  scale('transform'),
-  overview(),
-  bullets('.bullet'),
-  hash(),
-  extern(bespoke),
-  fullscreen(),
-  forms(),
-  janini()
-])
 
 $(() => {
   $('div.lazyiframe').each(function() {
@@ -54,4 +38,21 @@ $(() => {
       }
     })
   })
+  bespoke.from({
+    parent: 'article',
+    slides: 'div.sect1'
+  }, [
+    reporter(),
+    classes(),
+    nav(),
+    scale('transform'),
+    overview(),
+    bullets('.bullet'),
+    hash(),
+    extern(bespoke),
+    fullscreen(),
+    forms(),
+    janini(),
+    menu()
+  ])
 })

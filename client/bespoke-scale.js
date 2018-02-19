@@ -34,6 +34,7 @@ module.exports = function(options) {
         let originalFontSize = parseInt($(slide).attr('data-font-size'))
         if (!($(slide).hasClass('nozoom')) || overview) {
           $(wrapper).css(transformProperty, `scale(${ ratio })`)
+          let newWidth = Math.round(slideWidth * ratio)
           if ($(slide).hasClass('nozoom')) {
             $(slide).width(slideWidth)
             $(slide).height(slideHeight)
@@ -52,8 +53,6 @@ module.exports = function(options) {
           $(slide).height(newHeight)
           $(slide).css('margin-left', `-${ Math.round(newWidth / 2) }px`)
           $(slide).css('margin-right', `-${ Math.round(newWidth / 2) }px`)
-          $(slide).css('margin-top', `-${ Math.round(newHeight / 2) }px`)
-          $(slide).css('margin-bottom', `-${ Math.round(newHeight / 2) }px`)
           $(slide).css('font-size', `${ Math.round(ratio * originalFontSize)}px`)
           $(slide).css('line-height', `${ Math.round(ratio * originalFontSize * 1.4)}px`)
         }
@@ -63,5 +62,6 @@ module.exports = function(options) {
     scaleAll()
     deck.on('overview-start', () => { scaleAll(true) })
     deck.on('overview-end', () => { scaleAll(false) })
+    deck.on('should-scale', () => { scaleAll() })
   }
 }

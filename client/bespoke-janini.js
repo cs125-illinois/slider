@@ -15,6 +15,9 @@ module.exports = () => {
     let active
     deck.on('activate', e => {
       active = e
+      if (janinis[active.index]) {
+        janinis[active.index].refresh()
+      }
     })
 
     /*

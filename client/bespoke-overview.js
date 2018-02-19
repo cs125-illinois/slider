@@ -159,7 +159,7 @@ module.exports = function(opts) {
           scaledSlideHeight = slideHeight * scale,
           // NOTE x & y offset calculation based on transform origin at center of slide
           slideX = (deckWidth - scaledSlideWidth) / 2,
-          slideY = (deckHeight - scaledSlideHeight) / 2,
+          slideY = 0, // (deckHeight - scaledSlideHeight) / 2,
           scaledMargin = margin * scale,
           scaledTitleHeight = 0,
           row = 0, col = 0;
