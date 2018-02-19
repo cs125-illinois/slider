@@ -130,7 +130,7 @@ module.exports.from = (opts, plugins) => {
       path: '/slider/',
       hostname: link.hostname,
       port: link.port,
-      secure: (link.port === 443)
+      secure: (link.port === 443 || link.protocol === 'https:')
     })
     deck.socket.on('connect', status => {
       if (!(status.isAuthenticated)) {
