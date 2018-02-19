@@ -20,12 +20,14 @@ module.exports = () => {
     /*
      * Refreshing the editor causes it to immediately respond to font changes.
      */
-    window.addEventListener('resize', () => {
+    let refreshAll = () => {
       _(janinis)
         .each(editor => {
           editor.refresh()
         })
-    })
+    }
+    window.addEventListener('resize', () => { refreshAll() })
+    deck.on('overview-end', () => { refreshAll() })
 
     /*
      * Handle run events.

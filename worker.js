@@ -48,6 +48,9 @@ log.debug(config)
 const { OAuth2Client } = require('google-auth-library')
 var client = new OAuth2Client(process.env.GOOGLE, '', '');
 
+const fileWatcher = require('filewatcher')
+const distWatcher = fileWatcher()
+
 let sliderChanges
 class Slider extends SocketWorker {
   async login (info, respond, socket) {
@@ -74,28 +77,29 @@ class Slider extends SocketWorker {
   }
   run () {
     let app = express()
-    app.use(serveStatic(path.resolve(__dirname, 'dist')));
-    app.use(serveStatic(path.resolve(__dirname, 'public')));
     let mapping = {}
     let loadMapping = () => {
+      mapping = {}
       _.each(fs.readdirSync(path.resolve(__dirname, 'dist')), filename => {
         let components = filename.split('.')
-        mapping[`/${ components[0] }.${ components[2] }`] = filename
+        mapping[`${ components[0] }.${ components[2] }`] = filename
       })
     }
     loadMapping()
-    app.use((req, res, next) => {
-      if (req.url in mapping) {
-        res.redirect(302, mapping[req.url])
-        return
-      }
+    distWatcher.add(path.resolve(__dirname, 'dist'))
+    distWatcher.on('change', () => {
+      log.debug('Reloading client library')
       loadMapping()
-      if (req.url in mapping) {
-        res.redirect(302, mapping[req.url])
-        return
+    })
+    app.use((req, res, next) => {
+      let url = req.url.split("/").slice(1).join("/")
+      if (url in mapping) {
+        req.url = mapping[url]
       }
       return next()
     })
+    app.use(serveStatic(path.resolve(__dirname, 'dist')));
+    app.use(serveStatic(path.resolve(__dirname, 'public')));
     this.httpServer.on('request', app)
 
     this.scServer.on('connection', (socket) => {
