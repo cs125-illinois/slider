@@ -34,14 +34,16 @@ module.exports = function(options) {
         let originalFontSize = parseInt($(slide).attr('data-font-size'))
         if (!($(slide).hasClass('nozoom')) || overview) {
           $(wrapper).css(transformProperty, `scale(${ ratio })`)
-          $(slide).width(slideWidth)
-          $(slide).height(slideHeight)
-          $(slide).css('margin-left', '')
-          $(slide).css('margin-right', '')
-          $(slide).css('margin-top', '')
-          $(slide).css('margin-bottom', '')
-          $(slide).css('font-size', `${ originalFontSize }px`)
-          $(slide).css('line-height', `${ Math.round(originalFontSize * 1.4)}px`)
+          if ($(slide).hasClass('nozoom')) {
+            $(slide).width(slideWidth)
+            $(slide).height(slideHeight)
+            $(slide).css('margin-left', '')
+            $(slide).css('margin-right', '')
+            $(slide).css('margin-top', '')
+            $(slide).css('margin-bottom', '')
+            $(slide).css('font-size', `${ originalFontSize }px`)
+            $(slide).css('line-height', `${ Math.round(originalFontSize * 1.4)}px`)
+          }
         } else {
           $(wrapper).css(transformProperty, `scale(1.0)`)
           let newWidth = Math.round(slideWidth * ratio)
