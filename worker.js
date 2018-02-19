@@ -90,6 +90,9 @@ class Slider extends SocketWorker {
     currentSlide.email = authToken.email
     currentSlide.timestamp = moment().toDate()
     currentSlide.address = socket.remoteAddress
+    if (socket.request.headers['x-forwarded-for']) {
+      currentSlide.forwardedFor = socket.request.headers['x-forwarded-for']
+    }
     currentSlide.socketID = socket.id
 
     log.debug(currentSlide)
