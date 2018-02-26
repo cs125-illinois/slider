@@ -1,5 +1,17 @@
 let $ = require('jquery')
 let Hammer = require('hammerjs')
+delete Hammer.defaults.cssProps.userSelect;
+
+function getSelectedText() {
+  let text
+  if (typeof window.getSelection != "undefined") {
+    text = window.getSelection().toString()
+  } else if (typeof document.selection != "undefined" &&
+    document.selection.type == "Text") {
+    text = document.selection.createRange().text
+  }
+  return text
+}
 
 module.exports = (options) => {
   return (deck) => {
@@ -7,16 +19,17 @@ module.exports = (options) => {
 
     hammertime.get('swipe').set({ direction: Hammer.DIRECTION_ALL })
     hammertime.on('swipeleft', () => {
-      deck.prev()
+      if (!getSelectedText()) {
+        deck.next()
+      }
     })
     hammertime.on('swiperight', () => {
-      deck.next()
+      if (!getSelectedText()) {
+        deck.prev()
+      }
     })
     hammertime.on('swipeup', () => {
-      deck.fire('menu.show')
-    })
-    hammertime.on('swipedown', () => {
-      deck.fire('menu.hide')
+      deck.fire('menu.toggle')
     })
   }
 }

@@ -46,6 +46,10 @@ module.exports = () => {
       toggleHelp()
     })
 
+    $('.overviewToggle').click(() => {
+      deck.fire('overview')
+    })
+
     let updateLogin = (show) => {
       if (deck.authenticated) {
         $('nav #login').hide()
