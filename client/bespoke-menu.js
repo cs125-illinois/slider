@@ -29,11 +29,21 @@ module.exports = () => {
     deck.on('menu.toggle', () => {
       toggleMenu()
     })
+    $('.menuToggle').click(() => {
+      toggleMenu()
+    })
     deck.on('menu.show', () => {
       toggleMenu(true)
     })
     deck.on('menu.hide', () => {
       toggleMenu(false)
+    })
+
+    deck.on('help.toggle', () => {
+      toggleHelp()
+    })
+    $('.helpToggle').click(() => {
+      toggleHelp()
     })
 
     let updateLogin = (show) => {
@@ -56,9 +66,6 @@ module.exports = () => {
     deck.on('nologin', () => {
       forceShow = true
       updateLogin(true)
-    })
-    $('nav #help').click(() => {
-      toggleHelp()
     })
   }
 }

@@ -3,13 +3,14 @@ require('bootstrap')
 
 const bespoke = require('./bespoke.js')
 const reporter = require('./bespoke-reporter.js')
+const navKBD = require('./bespoke-nav-kbd')
+const navTouch = require('./bespoke-nav-touch')
 const scale = require('./bespoke-scale.js')
 const janini = require('./bespoke-janini.js')
 const overview = require('./bespoke-overview.js')
 const menu = require('./bespoke-menu.js')
 
 const classes = require('bespoke-classes')
-const nav = require('bespoke-nav')
 const bullets = require('bespoke-bullets')
 const hash = require('bespoke-hash')
 const extern = require('bespoke-extern')
@@ -47,7 +48,8 @@ $(() => {
   }, [
     reporter(),
     classes(),
-    nav(),
+    navKBD(),
+    navTouch(),
     scale('transform'),
     overview(),
     bullets('.bullet'),
