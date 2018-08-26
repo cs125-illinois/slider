@@ -1,0 +1,8 @@
+timezone: "America/Chicago"
+semesters:
+  Spring2018:
+    start: 01-16-2018
+    end: 05-11-2018
+  Fall2018:
+    start: 08-26-2018
+    end: 12-20-2018

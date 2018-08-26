@@ -70,6 +70,7 @@ module.exports.from = (opts, plugins) => {
 
   let deck = {
     id: $('meta[name="slider-id"]').attr('content').trim(),
+    semester: $('meta[name="slider-semester"]').attr('content').trim(),
     on: on,
     off: off,
     fire: fire,

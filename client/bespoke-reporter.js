@@ -6,6 +6,7 @@ module.exports = () => {
       if (deck.socket && currentSlide != reportedSlide) {
         deck.socket.emit('reporter', {
           deckID: deck.id,
+          slideSemester: deck.semester,
           slideID: currentSlide
         })
         reportedSlide = currentSlide

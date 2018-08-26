@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 require('dotenv').config()
 /*
   This is the SocketCluster master controller file.

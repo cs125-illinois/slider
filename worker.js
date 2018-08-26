@@ -1,6 +1,7 @@
 require('dotenv').config()
 const SocketWorker = require('socketcluster/scworker')
 const _ = require('lodash')
+const jsYAML = require('js-yaml')
 
 const express = require('express')
 const serveStatic = require('serve-static')
@@ -10,7 +11,7 @@ const fs = require('fs')
 const mongo = require('mongodb').MongoClient
 const expect = require('chai').expect
 const bunyan = require('bunyan')
-const moment = require('moment')
+const moment = require('moment-timezone')
 const log = bunyan.createLogger({
   name: 'slider',
   streams: [
@@ -24,7 +25,24 @@ const log = bunyan.createLogger({
   ]
 })
 
-const config = require('minimist')(process.argv.slice(2))
+const config = _.extend(
+  require('minimist')(process.argv.slice(2)),
+  jsYAML.safeLoad(fs.readFileSync('config.yaml', 'utf8')),
+)
+
+const semesters = _.mapValues(config.semesters, semester => {
+  return {
+    start: moment.tz(new Date(semester.start), config.timezone),
+    end: moment.tz(new Date(semester.end), config.timezone)
+  }
+})
+
+function getCurrentSemester() {
+  const now = moment()
+  return _.findKey(semesters, ({ start, end }) => {
+    return now.isBetween(start, end, null, '[]')
+  })
+}
 
 let PrettyStream = require('bunyan-prettystream')
 let prettyStream = new PrettyStream()
@@ -90,6 +108,10 @@ class Slider extends SocketWorker {
     currentSlide.email = authToken.email
     currentSlide.timestamp = moment().toDate()
     currentSlide.address = socket.remoteAddress
+    const currentSemester = getCurrentSemester()
+    if (currentSemester) {
+      currentSlide.currentSemester = currentSemester
+    }
     if (socket.request.headers['x-forward-for']) {
       currentSlide.forwardedFor = socket.request.headers['x-forward-for']
     }
