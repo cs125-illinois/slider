@@ -75,7 +75,8 @@ module.exports = () => {
         run.compiler = "Janino"
       }
 
-      $.post("https://cs125.cs.illinois.edu/janini/", JSON.stringify(run)).done(result => {
+      $.post("https://cs125.cs.illinois.edu/janini/run", JSON.stringify(run)).done(result => {
+        console.log(result)
         if (result.executed) {
           if (result.output.trim() !== "") {
             $(output).text(result.output.trim())
