@@ -61,8 +61,6 @@ if (config.debug) {
   })
 }
 
-log.debug(config)
-
 const { OAuth2Client } = require('google-auth-library')
 var client = new OAuth2Client(process.env.GOOGLE, '', '');
 
@@ -162,5 +160,5 @@ class Slider extends SocketWorker {
 
 mongo.connect(process.env.MONGO)
   .then(client => {
-    new Slider(client.db('Spring2018'))
+    new Slider(client.db('cs125'))
   })
