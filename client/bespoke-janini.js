@@ -59,29 +59,43 @@ module.exports = () => {
       } else {
         $(output).html(`<span class="text-warning">Running...</span>`)
       }
-      let run = {
-        source: source.getValue() + "\n"
-      }
+      source = source.getValue() + "\n"
+      let run
       if ($(active.slide).hasClass('compiler')) {
-        run.as = "compiler"
-        run.class = "Example"
+        run = {
+          as: "SimpleCompiler", className: "Example",
+          sources: [ source ]
+        }
       } else {
-        run.as = "script"
+        run = { as: "Snippet", source }
+      }
+      if ($(active.slide).hasClass('jdk')) {
+        run.compiler = "JDK"
+      } else {
+        run.compiler = "Janino"
       }
 
       $.post("https://cs125.cs.illinois.edu/janini/", JSON.stringify(run)).done(result => {
-        if (result.completed) {
+        if (result.executed) {
           if (result.output.trim() !== "") {
             $(output).text(result.output.trim())
           } else {
             $(output).html(`<span class="text-success">(Completed with no or blank output)</span>`)
           }
-        } else if (result.timeout) {
+        } else if (result.timedOut) {
           $(output).html(`<span class="text-danger">Timeout</span>`)
         } else if (!result.compiled) {
-          $(output).html(`<span class="text-danger">Compiler error:\n${ result.compileError }</span>`)
-        } else if (!result.ran) {
-          $(output).html(`<span class="text-danger">Runtime error:\n${ result.runtimeError }</span>`)
+          let message = "Compilation Failed"
+          if (result.compilationErrorMessage) {
+            message += `:\n${ result.compilationErrorMessage }`
+          }
+          $(output).html(`<span class="text-danger">${ message }</span>`)
+        } else if (!result.executed) {
+          let message = "Execution Failed"
+          if (result.executionErrorStackTrace) {
+            message += `:\n${ result.executionErrorStackTrace }`
+          }
+          $(output).html(`<span class="text-danger">${ message }</span>`)
         }
       }).fail((xhr, status, error) => {
         console.error("Request failed")
