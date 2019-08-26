@@ -69,7 +69,13 @@ module.exports = () => {
         tasks: [ "execute" ],
       }
       if ($(active.slide).hasClass('compiler')) {
-        job.sources = { "Example.java": source }
+        job.source = { "Example.java": source }
+        job.arguments = {
+          execution: {
+            klass: "Example",
+            method: "main(String[])"
+          }
+        }
       } else {
         job.snippet = source
       }
