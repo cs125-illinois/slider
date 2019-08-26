@@ -21,10 +21,7 @@ module.exports = () => {
     })
 
     let token
-    deck.on('token', t => {
-      token = t
-      console.log(token)
-    })
+    deck.on('token', t => { token = t })
 
     /*
      * Refreshing the editor causes it to immediately respond to font changes.
@@ -76,10 +73,10 @@ module.exports = () => {
       } else {
         job.snippet = source
       }
+      console.debug(job)
       if (token) {
         job.authToken = token
       }
-      console.debug(job)
 
       $.ajax({
         url: "http://localhost:3001/",
