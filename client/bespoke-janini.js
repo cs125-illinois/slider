@@ -79,7 +79,7 @@ module.exports = () => {
       }
 
       $.ajax({
-        url: "http://localhost:3001/",
+        url: "https://cs125-cloud.cs.illinois.edu/jeed/",
         type: "POST",
         data: JSON.stringify(job),
         contentType:"application/json; charset=utf-8",
