@@ -48,10 +48,11 @@
     "sc-hot-reboot": "~1.0.0",
     "scc-broker-client": "~3.0.0",
     "serve-static": "^1.13.2",
-    "socketcluster": "~11.1.0",
-    "socketcluster-client": "~11.0.0",
+    "socketcluster": "^11.1.0",
+    "socketcluster-client": "^11.0.2",
     "split.js": "^1.3.5",
     "uglifyjs-webpack-plugin": "^1.2.4",
+    "uws": "^10.148.1",
     "webpack": "^4.2.0",
     "webpack-cleanup-plugin": "^0.5.1",
     "webpack-cli": "^2.0.13"

@@ -112,6 +112,7 @@ module.exports.from = (opts, plugins) => {
       return
     }
     let token = user.getAuthResponse().id_token
+    fire('token', token)
     if (deck.socket) {
       deck.socket.emit('login', {
         sliderID: deck.id,

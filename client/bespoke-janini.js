@@ -20,6 +20,12 @@ module.exports = () => {
       }
     })
 
+    let token
+    deck.on('token', t => {
+      token = t
+      console.log(token)
+    })
+
     /*
      * Refreshing the editor causes it to immediately respond to font changes.
      */
@@ -59,45 +65,86 @@ module.exports = () => {
       } else {
         $(output).html(`<span class="text-warning">Running...</span>`)
       }
-      source = source.getValue() + "\n"
-      let run
-      if ($(active.slide).hasClass('compiler')) {
-        run = {
-          as: "SimpleCompiler", className: "Example",
-          sources: [ source ]
-        }
-      } else {
-        run = { as: "Snippet", source }
-      }
-      if ($(active.slide).hasClass('jdk')) {
-        run.compiler = "JDK"
-      } else {
-        run.compiler = "Janino"
-      }
 
-      $.post("https://cs125.cs.illinois.edu/janini/run", JSON.stringify(run)).done(result => {
-        console.log(result)
-        if (result.executed) {
-          if (result.output.trim() !== "") {
-            $(output).text(result.output.trim())
-          } else {
-            $(output).html(`<span class="text-success">(Completed with no or blank output)</span>`)
-          }
-        } else if (result.timedOut) {
-          $(output).html(`<span class="text-danger">Timeout</span>`)
-        } else if (!result.compiled) {
-          let message = "Compilation Failed"
-          if (result.compilationErrorMessage) {
-            message += `:\n${ result.compilationErrorMessage }`
-          }
-          $(output).html(`<span class="text-danger">${ message }</span>`)
-        } else if (!result.executed) {
-          let message = "Execution Failed"
-          if (result.executionErrorStackTrace) {
-            message += `:\n${ result.executionErrorStackTrace }`
-          }
-          $(output).html(`<span class="text-danger">${ message }</span>`)
+      source = source.getValue() + "\n"
+      const job = {
+        label: `slider:${ deck.id }:${ active.slideID || "(?)" }`,
+        tasks: [ "execute" ],
+      }
+      if ($(active.slide).hasClass('compiler')) {
+        job.sources = { "Example.java": source }
+      } else {
+        job.snippet = source
+      }
+      if (token) {
+        job.authToken = token
+      }
+      console.debug(job)
+
+      $.ajax({
+        url: "http://localhost:3001/",
+        type: "POST",
+        data: JSON.stringify(job),
+        contentType:"application/json; charset=utf-8",
+        dataType: "json"
+      }).done(result => {
+        console.debug(result)
+        let resultOutput = ""
+        if (result.failed.snippet) {
+          const { errors } = result.failed.snippet
+          resultOutput += errors.map(error => {
+            const { line, column, message } = error
+            const originalLine = job.snippet.split("\n")[line - 1]
+            return `Line ${ line }: error: ${ message }
+${ originalLine }
+${ new Array(column).join(" ") }^`
+          }).join("\n")
+
+          const errorCount = Object.keys(errors).length
+          resultOutput += `
+${ errorCount } error${ errorCount > 1 ? "s" : "" }`
+        } else if (result.failed.compilation) {
+          const { errors } = result.failed.compilation
+          resultOutput += errors.map(error => {
+            const { source, line, column } = error.location
+            const originalLine = source === "" ?
+              job.snippet.split("\n")[line - 1] :
+              job.sources[source].split("\n")[line - 1]
+            const firstErrorLine = error.message.split("\n").slice(0, 1).join("\n")
+            const restError = error.message.split("\n").slice(1).filter(errorLine => {
+              if (source === "" && errorLine.trim().startsWith("location: class")) {
+                return false
+              } else {
+                return true
+              }
+            }).join("\n")
+            return `${ source === "" ? "Line " : source }${ line }: error: ${ firstErrorLine }
+${ originalLine }
+${ new Array(column).join(" ") }^
+${ restError }`
+          }).join("\n")
+          const errorCount = Object.keys(errors).length
+          resultOutput += `
+${ errorCount } error${ errorCount > 1 ? "s" : "" }`
+        } else if (result.failed.execution) {
+          resultOutput += result.failed.execution
         }
+
+        if (Object.keys(result.failed).length === 0) {
+          if (result.completed.execution) {
+            const { execution } = result.completed
+            resultOutput += execution.outputLines.map(outputLine => {
+              return outputLine.line
+            }).join("\n")
+            if (execution.timeout) {
+              resultOutput += "\n(Program Timed Out)"
+            }
+            if (execution.truncatedLines > 0) {
+              resultOutput += `\n(${ execution.truncatedLines } lines were truncated)`
+            }
+          }
+        }
+        $(output).text(resultOutput)
       }).fail((xhr, status, error) => {
         console.error("Request failed")
         console.error(JSON.stringify(xhr, null, 2))
