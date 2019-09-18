@@ -66,7 +66,12 @@ module.exports = () => {
       source = source.getValue() + "\n"
       const job = {
         label: `slider:${ deck.id }:${ active.slideID || "(?)" }`,
-        tasks: [ "execute" ],
+        tasks: [ "checkstyle", "execute" ],
+        arguments: {
+          checkstyle: {
+            failOnError: true
+          }
+        }
       }
       if ($(active.slide).hasClass('compiler')) {
         job.source = { "Example.java": source }
@@ -78,6 +83,9 @@ module.exports = () => {
         }
       } else {
         job.snippet = source
+        job.arguments.snippet = {
+          indent: 2
+        }
       }
       console.debug(job)
       if (token) {
@@ -125,6 +133,15 @@ ${ errorCount } error${ errorCount > 1 ? "s" : "" }`
 ${ originalLine }
 ${ new Array(column).join(" ") }^
 ${ restError }`
+          }).join("\n")
+          const errorCount = Object.keys(errors).length
+          resultOutput += `
+${ errorCount } error${ errorCount > 1 ? "s" : "" }`
+        } else if (result.failed.checkstyle) {
+          const { errors } = result.failed.checkstyle
+          resultOutput += errors.map(error => {
+            const { source, line, column } = error.location
+            return `${ source === "" ? "Line " : source }${ line }: checkstyle error: ${ error.message }`
           }).join("\n")
           const errorCount = Object.keys(errors).length
           resultOutput += `
