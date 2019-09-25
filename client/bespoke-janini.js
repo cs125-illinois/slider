@@ -120,7 +120,7 @@ ${ errorCount } error${ errorCount > 1 ? "s" : "" }`
             const { source, line, column } = error.location
             const originalLine = source === "" ?
               job.snippet.split("\n")[line - 1] :
-              job.sources[source].split("\n")[line - 1]
+              job.source['Example.java'].split("\n")[line - 1]
             const firstErrorLine = error.message.split("\n").slice(0, 1).join("\n")
             const restError = error.message.split("\n").slice(1).filter(errorLine => {
               if (source === "" && errorLine.trim().startsWith("location: class")) {
