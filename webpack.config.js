@@ -5,6 +5,7 @@ const path = require('path')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
+const Dotenv = require('dotenv-webpack')
 
 module.exports = function (env, argv) {
   let config = {
@@ -32,7 +33,8 @@ module.exports = function (env, argv) {
       new UglifyJSPlugin({
         cache: true
       }),
-      new WebpackCleanupPlugin()
+      new WebpackCleanupPlugin(),
+      new Dotenv()
     ],
     module: {
       rules: [

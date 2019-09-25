@@ -75,11 +75,9 @@ module.exports = () => {
       }
       if ($(active.slide).hasClass('compiler')) {
         job.source = { "Example.java": source }
-        job.arguments = {
-          execution: {
-            klass: "Example",
-            method: "main(String[])"
-          }
+        job.arguments.execution = {
+          klass: "Example",
+          method: "main(String[])"
         }
       } else {
         job.snippet = source
@@ -93,7 +91,7 @@ module.exports = () => {
       }
 
       $.ajax({
-        url: "https://cs125-cloud.cs.illinois.edu/jeed/",
+        url: process.env.JEED,
         type: "POST",
         data: JSON.stringify(job),
         contentType:"application/json; charset=utf-8",
@@ -147,7 +145,15 @@ ${ errorCount } error${ errorCount > 1 ? "s" : "" }`
           resultOutput += `
 ${ errorCount } error${ errorCount > 1 ? "s" : "" }`
         } else if (result.failed.execution) {
-          resultOutput += result.failed.execution
+          if (result.failed.execution.classNotFound) {
+            resultOutput += `Error: could not find class ${ result.failed.execution.classNotFound.klass }`
+          } else if (result.failed.execution.methodNotFound) {
+            resultOutput += `Error: could not find method ${ result.failed.execution.methodNotFound.method }`
+          } else if (result.failed.execution.threw) {
+            resultOutput += result.failed.execution.threw
+          } else {
+            resultOutput += "Something went wrong..."
+          }
         }
 
         if (Object.keys(result.failed).length === 0) {
