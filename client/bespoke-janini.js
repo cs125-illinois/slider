@@ -74,7 +74,7 @@ module.exports = () => {
         }
       }
       if ($(active.slide).hasClass('compiler')) {
-        job.source = { "Example.java": source }
+        job.sources = [ { path: "Example.java", contents: source } ]
         job.arguments.execution = {
           klass: "Example",
           method: "main(String[])"
