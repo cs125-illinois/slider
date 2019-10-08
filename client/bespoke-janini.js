@@ -66,12 +66,15 @@ module.exports = () => {
       source = source.getValue() + "\n"
       const job = {
         label: `slider:${ deck.id }:${ active.slideID || "(?)" }`,
-        tasks: [ "checkstyle", "execute" ],
+        tasks: [ "execute" ],
         arguments: {
           checkstyle: {
             failOnError: true
           }
         }
+      }
+      if (!($(active.slide).hasClass('nocheckstyle'))) {
+        job.tasks.unshift("checkstyle")
       }
       if ($(active.slide).hasClass('compiler')) {
         job.sources = [ { path: "Example.java", contents: source } ]
@@ -118,7 +121,7 @@ ${ errorCount } error${ errorCount > 1 ? "s" : "" }`
             const { source, line, column } = error.location
             const originalLine = source === "" ?
               job.snippet.split("\n")[line - 1] :
-              job.source['Example.java'].split("\n")[line - 1]
+              job.sources[0].contents.split("\n")[line - 1]
             const firstErrorLine = error.message.split("\n").slice(0, 1).join("\n")
             const restError = error.message.split("\n").slice(1).filter(errorLine => {
               if (source === "" && errorLine.trim().startsWith("location: class")) {
@@ -127,7 +130,7 @@ ${ errorCount } error${ errorCount > 1 ? "s" : "" }`
                 return true
               }
             }).join("\n")
-            return `${ source === "" ? "Line " : source }${ line }: error: ${ firstErrorLine }
+            return `${ source === "" ? "Line " : `${source}:` }${ line }: error: ${ firstErrorLine }
 ${ originalLine }
 ${ new Array(column).join(" ") }^
 ${ restError }`
