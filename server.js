@@ -22,7 +22,7 @@ const options = module.exports.options = {
   path: WSPATH,
   workerController: path.join(__dirname, 'worker.js'),
   killMasterOnSignal: 'NODEMON' in process.env,
-  wsEngine: 'uws'
+  wsEngine: 'ws'
 }
 
 const socketCluster = new SocketCluster(options)

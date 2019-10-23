@@ -158,7 +158,7 @@ class Slider extends SocketWorker {
   }
 }
 
-mongo.connect(process.env.MONGO)
+mongo.connect(process.env.MONGO, { useUnifiedTopology: true })
   .then(client => {
     new Slider(client.db('cs125'))
   })
