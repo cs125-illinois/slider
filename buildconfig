@@ -2,6 +2,7 @@
 ./package.json
 
 [npm run webpack]
+./webpack.config.js
 ./.env
 ./client/**/*
 ./package.json

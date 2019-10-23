@@ -116,7 +116,7 @@ class Slider extends SocketWorker {
     currentSlide.socketID = socket.id
 
     log.debug(currentSlide)
-    this.sliderChanges.insert(currentSlide)
+    this.sliderChanges.insertOne(currentSlide)
 
     return respond()
   }

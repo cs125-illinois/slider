@@ -9,6 +9,12 @@ const Dotenv = require('dotenv-webpack')
 
 module.exports = function (env, argv) {
   let config = {
+    /*
+    mode: 'development',
+    optimization: {
+      minimize: false
+    },
+    */
     output: {
       publicPath: '/',
       path: __dirname + '/dist/',
@@ -30,9 +36,7 @@ module.exports = function (env, argv) {
         Popper: ['popper.js', 'default']
       }),
       new ExtractTextPlugin('[name].[chunkhash].css'),
-      new UglifyJSPlugin({
-        cache: true
-      }),
+      // new UglifyJSPlugin({ cache: true }),
       new WebpackCleanupPlugin(),
       new Dotenv()
     ],

@@ -5,7 +5,7 @@ let CodeMirror = require('codemirror')
 require("codemirror/mode/clike/clike")
 require("codemirror/addon/edit/closebrackets")
 require("codemirror/lib/codemirror.css")
-let Split = require('split.js')
+let Split = require('split.js').default
 
 module.exports = () => {
   return (deck) => {
