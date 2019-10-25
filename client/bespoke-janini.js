@@ -142,7 +142,7 @@ ${ errorCount } error${ errorCount > 1 ? "s" : "" }`
           const { errors } = result.failed.checkstyle
           resultOutput += errors.map(error => {
             const { source, line, column } = error.location
-            return `${ source === "" ? "Line " : source }${ line }: checkstyle error: ${ error.message }`
+            return `${ source === "" ? "Line " : `${source}:` }${ line }: checkstyle error: ${ error.message }`
           }).join("\n")
           const errorCount = Object.keys(errors).length
           resultOutput += `
