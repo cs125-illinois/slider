@@ -34,7 +34,10 @@ module.exports = function (env, argv) {
       }),
       new ExtractTextPlugin('[name].[chunkhash].css'),
       new WebpackCleanupPlugin(),
-      new Dotenv()
+      new Dotenv(),
+      new webpack.DefinePlugin({
+        'process.env.JEED': JSON.stringify(process.env.JEED)
+      })
     ],
     module: {
       rules: [
