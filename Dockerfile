@@ -5,6 +5,7 @@ RUN apk add --no-cache --virtual .gyp python make g++
 COPY package*.json ./
 COPY config.yaml server.js worker.js webpack.config.js ./
 COPY client/ ./client/
+ENV JEED https://cs125-cloud.cs.illinois.edu/jeed/
 RUN npm i && npm run webpack
 RUN apk del .gyp
 

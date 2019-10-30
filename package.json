@@ -1,6 +1,5 @@
 {
   "name": "slider",
-  "version": "2019.10.1",
   "private": true,
   "scripts": {
     "depcheck": "depcheck --ignores=css-loader,expose-loader,node-sass,sass-loader,webpack-cli,ws",

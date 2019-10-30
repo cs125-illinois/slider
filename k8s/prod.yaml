@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slider-deployment
+  namespace: slider
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slider
+  template:
+    metadata:
+      labels:
+        app: slider
+    spec:
+      containers:
+      - name: slider
+        command: [ "/bin/sh" ]
+        args: [ "-c", "tail -f /dev/null" ]
+        image: cs125/slider:2019.10.1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3088
+        env:
+        - name: TZ
+          value: "America/Chicago"
+        - name: ENVIRONMENT
+          value: "production"
+        - name: MONGODB
+          valueFrom:
+            secretKeyRef:
+              name: mongodb
+              key: MONGODB
+        - name: GOOGLE
+          value: 948918026196-p399ooibc7pr0ci7ida63jb5a6n4vsik.apps.googleusercontent.com
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+  namespace: app
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3088
+  selector:
+    app: app
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  namespace: app
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/proxy-redirect-from: /
+    nginx.ingress.kubernetes.io/proxy-redirect-to: /slider/
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/affinity-mode: balanced
+    nginx.ingress.kubernetes.io/session-cookie-path: "slider"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
+  name: app-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /slider(/|$)(.*)
+        backend:
+          serviceName: slider-service
+          servicePort: 80
