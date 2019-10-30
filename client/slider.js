@@ -17,26 +17,25 @@ const extern = require('bespoke-extern')
 const fullscreen = require('bespoke-fullscreen')
 const forms = require('bespoke-forms')
 
-highlightJS = require('highlight.js')
+const highlightJS = require('highlight.js')
 window.hljs = highlightJS
-highlightJSNumbers = require('./lib/highlightjs-line-numbers.js')
+const highlightJSNumbers = require('./lib/highlightjs-line-numbers.js') // eslint-disable-line no-unused-vars
 highlightJS.initHighlightingOnLoad()
 highlightJS.initLineNumbersOnLoad({ singleLine: true })
 
 $(() => {
-
-  $('div.lazyiframe').each(function() {
-    var iframe = $("<iframe/>")
+  $('div.lazyiframe').each(function () {
+    var iframe = $('<iframe/>')
     $.each(JSON.parse(decodeURI($(this).data('attribs'))), (name, value) => {
-      $(iframe).attr(name, value);
+      $(iframe).attr(name, value)
     })
     $(this).replaceWith(iframe)
   })
   $('[data-toggle="popover"]').popover()
   $('body').on('click', e => {
-    $('[data-toggle="popover"]').each(function() {
+    $('[data-toggle="popover"]').each(function () {
       if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-        $(this).popover('hide');
+        $(this).popover('hide')
       }
     })
   })

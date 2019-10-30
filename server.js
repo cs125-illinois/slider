@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+'use strict'
 
 require('dotenv/config')
 const { name, version } = require('./package.json')

@@ -2,11 +2,11 @@ const $ = require('jquery')
 
 module.exports = () => {
   return (deck) => {
-    let isModifierPressed = e => {
-      return !!(e.ctrlKey || e.shiftKey || e.altKey || e.metaKey);
+    const isModifierPressed = e => {
+      return !!(e.ctrlKey || e.shiftKey || e.altKey || e.metaKey)
     }
 
-    let toggleMenu = (show) => {
+    const toggleMenu = (show) => {
       show = show !== undefined ? show : $('nav').css('display') === 'none'
       if (show) {
         $('nav').show()
@@ -15,8 +15,8 @@ module.exports = () => {
       }
       deck.fire('should-scale')
     }
-    let toggleHelp = () => {
-      $("#helpModal").modal('toggle')
+    const toggleHelp = () => {
+      $('#helpModal').modal('toggle')
     }
     document.addEventListener('keydown', e => {
       if (e.which === 77 && !isModifierPressed(e)) {
@@ -50,7 +50,7 @@ module.exports = () => {
       deck.fire('overview')
     })
 
-    let updateLogin = (show) => {
+    const updateLogin = (show) => {
       if (deck.authenticated) {
         $('nav #login').hide()
         $('nav #logout').show()
@@ -68,7 +68,6 @@ module.exports = () => {
       updateLogin()
     })
     deck.on('nologin', () => {
-      forceShow = true
       updateLogin(true)
     })
   }

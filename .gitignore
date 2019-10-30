@@ -1,7 +1,6 @@
 /node_modules/
 *.swp
 *.swo
-/logs
-/.env
 /dist
 /.buildifchanged
+/.env

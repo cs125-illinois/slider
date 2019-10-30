@@ -3,18 +3,15 @@ const webpack = require('webpack')
 const path = require('path')
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
 const Dotenv = require('dotenv-webpack')
 
 module.exports = function (env, argv) {
-  let config = {
-    /*
-    mode: 'development',
+  return {
+    mode: process.env.ENVIRONMENT,
     optimization: {
-      minimize: false
+      minimize: process.env.ENVIRONMENT !== 'development'
     },
-    */
     output: {
       publicPath: '/',
       path: __dirname + '/dist/',
@@ -36,7 +33,6 @@ module.exports = function (env, argv) {
         Popper: ['popper.js', 'default']
       }),
       new ExtractTextPlugin('[name].[chunkhash].css'),
-      // new UglifyJSPlugin({ cache: true }),
       new WebpackCleanupPlugin(),
       new Dotenv()
     ],
@@ -80,8 +76,4 @@ module.exports = function (env, argv) {
       ]
     }
   }
-  if (!(process.env.ENV === 'production')) {
-    config.plugins = config.plugins.filter((plugin) => plugin.constructor.name !== 'UglifyJsPlugin')
-  }
-  return config
 }

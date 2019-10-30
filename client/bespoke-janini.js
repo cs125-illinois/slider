@@ -1,11 +1,11 @@
 const $ = require('jquery')
 const _ = require('lodash')
 
-let CodeMirror = require('codemirror')
-require("codemirror/mode/clike/clike")
-require("codemirror/addon/edit/closebrackets")
-require("codemirror/lib/codemirror.css")
-let Split = require('split.js').default
+const CodeMirror = require('codemirror')
+require('codemirror/mode/clike/clike')
+require('codemirror/addon/edit/closebrackets')
+require('codemirror/lib/codemirror.css')
+const Split = require('split.js').default
 
 module.exports = () => {
   return (deck) => {
@@ -26,7 +26,7 @@ module.exports = () => {
     /*
      * Refreshing the editor causes it to immediately respond to font changes.
      */
-    let refreshAll = () => {
+    const refreshAll = () => {
       _(janinis)
         .each(editor => {
           editor.refresh()
@@ -47,26 +47,26 @@ module.exports = () => {
       run()
     })
 
-    let run = () => {
+    const run = () => {
       if (!(janinis[active.index])) {
         return true
       }
       let source = janinis[active.index]
 
-      let output = $(active.slide).find('.output').first()
+      const output = $(active.slide).find('.output').first()
 
-      let toRun = source.getValue()
-      if (toRun.trim() === "") {
+      const toRun = source.getValue()
+      if (toRun.trim() === '') {
         $(output).html($(output).data('blank'))
         return
       } else {
-        $(output).html(`<span class="text-warning">Running...</span>`)
+        $(output).html('<span class="text-warning">Running...</span>')
       }
 
-      source = source.getValue() + "\n"
+      source = source.getValue() + '\n'
       const job = {
-        label: `slider:${ deck.id }:${ active.slideID || "(?)" }`,
-        tasks: [ "execute" ],
+        label: `slider:${deck.id}:${active.slideID || '(?)'}`,
+        tasks: ['execute'],
         arguments: {
           checkstyle: {
             failOnError: true
@@ -74,13 +74,13 @@ module.exports = () => {
         }
       }
       if (!($(active.slide).hasClass('nocheckstyle'))) {
-        job.tasks.unshift("checkstyle")
+        job.tasks.unshift('checkstyle')
       }
       if ($(active.slide).hasClass('compiler')) {
-        job.sources = [ { path: "Example.java", contents: source } ]
+        job.sources = [{ path: 'Example.java', contents: source }]
         job.arguments.execution = {
-          klass: "Example",
-          method: "main(String[])"
+          klass: 'Example',
+          method: 'main(String[])'
         }
       } else {
         job.snippet = source
@@ -95,67 +95,67 @@ module.exports = () => {
 
       $.ajax({
         url: process.env.JEED,
-        type: "POST",
+        type: 'POST',
         data: JSON.stringify(job),
-        contentType:"application/json; charset=utf-8",
-        dataType: "json"
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json'
       }).done(result => {
         console.debug(result)
-        let resultOutput = ""
+        let resultOutput = ''
         if (result.failed.snippet) {
           const { errors } = result.failed.snippet
           resultOutput += errors.map(error => {
             const { line, column, message } = error
-            const originalLine = job.snippet.split("\n")[line - 1]
-            return `Line ${ line }: error: ${ message }
-${ originalLine }
-${ new Array(column).join(" ") }^`
-          }).join("\n")
+            const originalLine = job.snippet.split('\n')[line - 1]
+            return `Line ${line}: error: ${message}
+${originalLine}
+${new Array(column).join(' ')}^`
+          }).join('\n')
 
           const errorCount = Object.keys(errors).length
           resultOutput += `
-${ errorCount } error${ errorCount > 1 ? "s" : "" }`
+${errorCount} error${errorCount > 1 ? 's' : ''}`
         } else if (result.failed.compilation) {
           const { errors } = result.failed.compilation
           resultOutput += errors.map(error => {
             const { source, line, column } = error.location
-            const originalLine = source === "" ?
-              job.snippet.split("\n")[line - 1] :
-              job.sources[0].contents.split("\n")[line - 1]
-            const firstErrorLine = error.message.split("\n").slice(0, 1).join("\n")
-            const restError = error.message.split("\n").slice(1).filter(errorLine => {
-              if (source === "" && errorLine.trim().startsWith("location: class")) {
+            const originalLine = source === ''
+              ? job.snippet.split('\n')[line - 1]
+              : job.sources[0].contents.split('\n')[line - 1]
+            const firstErrorLine = error.message.split('\n').slice(0, 1).join('\n')
+            const restError = error.message.split('\n').slice(1).filter(errorLine => {
+              if (source === '' && errorLine.trim().startsWith('location: class')) {
                 return false
               } else {
                 return true
               }
-            }).join("\n")
-            return `${ source === "" ? "Line " : `${source}:` }${ line }: error: ${ firstErrorLine }
-${ originalLine }
-${ new Array(column).join(" ") }^
-${ restError }`
-          }).join("\n")
+            }).join('\n')
+            return `${source === '' ? 'Line ' : `${source}:`}${line}: error: ${firstErrorLine}
+${originalLine}
+${new Array(column).join(' ')}^
+${restError}`
+          }).join('\n')
           const errorCount = Object.keys(errors).length
           resultOutput += `
-${ errorCount } error${ errorCount > 1 ? "s" : "" }`
+${errorCount} error${errorCount > 1 ? 's' : ''}`
         } else if (result.failed.checkstyle) {
           const { errors } = result.failed.checkstyle
           resultOutput += errors.map(error => {
-            const { source, line, column } = error.location
-            return `${ source === "" ? "Line " : `${source}:` }${ line }: checkstyle error: ${ error.message }`
-          }).join("\n")
+            const { source, line } = error.location
+            return `${source === '' ? 'Line ' : `${source}:`}${line}: checkstyle error: ${error.message}`
+          }).join('\n')
           const errorCount = Object.keys(errors).length
           resultOutput += `
-${ errorCount } error${ errorCount > 1 ? "s" : "" }`
+${errorCount} error${errorCount > 1 ? 's' : ''}`
         } else if (result.failed.execution) {
           if (result.failed.execution.classNotFound) {
-            resultOutput += `Error: could not find class ${ result.failed.execution.classNotFound.klass }`
+            resultOutput += `Error: could not find class ${result.failed.execution.classNotFound.klass}`
           } else if (result.failed.execution.methodNotFound) {
-            resultOutput += `Error: could not find method ${ result.failed.execution.methodNotFound.method }`
+            resultOutput += `Error: could not find method ${result.failed.execution.methodNotFound.method}`
           } else if (result.failed.execution.threw) {
             resultOutput += result.failed.execution.threw
           } else {
-            resultOutput += "Something went wrong..."
+            resultOutput += 'Something went wrong...'
           }
         }
 
@@ -164,52 +164,51 @@ ${ errorCount } error${ errorCount > 1 ? "s" : "" }`
             const { execution } = result.completed
             resultOutput += execution.outputLines.map(outputLine => {
               return outputLine.line
-            }).join("\n")
+            }).join('\n')
             if (execution.timeout) {
-              resultOutput += "\n(Program Timed Out)"
+              resultOutput += '\n(Program Timed Out)'
             }
             if (execution.truncatedLines > 0) {
-              resultOutput += `\n(${ execution.truncatedLines } lines were truncated)`
+              resultOutput += `\n(${execution.truncatedLines} lines were truncated)`
             }
           }
         }
         $(output).text(resultOutput)
       }).fail((xhr, status, error) => {
-        console.error("Request failed")
+        console.error('Request failed')
         console.error(JSON.stringify(xhr, null, 2))
         console.error(JSON.stringify(status, null, 2))
         console.error(JSON.stringify(error, null, 2))
-        $(output).html(`<span class="text-danger">An error occurred</span>`)
+        $(output).html('<span class="text-danger">An error occurred</span>')
       })
     }
 
     /*
      * Set up Janini editor windows.
      */
-    let janinis = {}
+    const janinis = {}
     _.each(deck.slides, (slide, i) => {
-      $(slide).find("textarea.janini").each((unused, editor) => {
+      $(slide).find('textarea.janini').each((unused, editor) => {
         janinis[i] = CodeMirror.fromTextArea($(editor).get(0), {
           mode: 'text/x-java',
           lineNumbers: true,
           matchBrackets: true,
           lineWrapping: true
         })
-        $(slide).find("div.output").click((e) => {
-          var sel = getSelection().toString();
+        $(slide).find('div.output').click((e) => {
           if (!(getSelection().toString().length > 0 &&
             e.target.contains(getSelection().anchorNode))) {
             run()
           }
         })
-        $(slide).find("div.output").each((unused, output) => {
-          $(output).attr('id', `janini-output-${ i }`)
+        $(slide).find('div.output').each((unused, output) => {
+          $(output).attr('id', `janini-output-${i}`)
         })
-        $(slide).find(".CodeMirror").each((unused, input) => {
-          $(input).attr('id', `janini-input-${ i }`)
+        $(slide).find('.CodeMirror').each((unused, input) => {
+          $(input).attr('id', `janini-input-${i}`)
         })
-        Split([`#janini-input-${ i }`, `#janini-output-${ i }`], {
-          sizes: [ 70, 30 ],
+        Split([`#janini-input-${i}`, `#janini-output-${i}`], {
+          sizes: [70, 30],
           direction: 'vertical',
           elementStyle: function (dimension, size, gutterSize) {
             return {
@@ -218,12 +217,11 @@ ${ errorCount } error${ errorCount > 1 ? "s" : "" }`
           },
           gutterStyle: function (dimension, gutterSize) {
             return {
-              'flex-basis':  gutterSize + 'px'
+              'flex-basis': gutterSize + 'px'
             }
           }
         })
       })
     })
-
   }
 }

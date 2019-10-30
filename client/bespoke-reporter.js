@@ -2,8 +2,8 @@ module.exports = () => {
   return (deck) => {
     let reportedSlide
     let currentSlide
-    let reportChange = () => {
-      if (deck.socket && currentSlide != reportedSlide) {
+    const reportChange = () => {
+      if (deck.socket && currentSlide !== reportedSlide) {
         deck.socket.emit('reporter', {
           deckID: deck.id,
           slideSemester: deck.semester,

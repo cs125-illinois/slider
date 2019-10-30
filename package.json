@@ -1,8 +1,19 @@
 {
   "name": "slider",
+  "version": "2019.10.1",
   "private": true,
+  "scripts": {
+    "depcheck": "depcheck --ignores=css-loader,expose-loader,node-sass,sass-loader,webpack-cli,ws",
+    "eslint": "eslint server.js worker.js client/*.js --fix",
+    "build": "build-if-changed",
+    "webpack": "webpack",
+    "docker:build": "cross-conf-env docker build . -t cs125/slider:$npm_package_version",
+    "post:dockerbuild": "npm run docker:tag",
+    "docker:tag": "cross-conf-env docker tag cs125/slider:$npm_package_version cs125/slider:latest",
+    "docker:push": "cross-conf-env docker push cs125/slider:$npm_package_version && cross-conf-env docker push cs125/slider:latest",
+    "start": "node server.js --debug"
+  },
   "dependencies": {
-    "ajv": "^6.10.2",
     "bespoke": "^1.1.0",
     "bespoke-bullets": "^1.1.0",
     "bespoke-classes": "^1.0.0",
@@ -10,18 +21,14 @@
     "bespoke-forms": "^1.0.0",
     "bespoke-fullscreen": "^1.0.0",
     "bespoke-hash": "^1.1.0",
-    "bespoke-nav": "^1.0.2",
     "bootstrap": "^4.3.1",
     "build-if-changed": "^0.1.2",
     "bunyan": "^1.8.12",
     "bunyan-prettystream": "^0.1.3",
     "chai": "^4.2.0",
     "codemirror": "^5.49.2",
-    "connect": "3.7.0",
-    "css-loader": "^3.2.0",
     "dotenv": "^8.2.0",
     "dotenv-webpack": "^1.7.0",
-    "expose-loader": "^0.7.5",
     "express": "^4.17.1",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "filewatcher": "^3.0.1",
@@ -35,27 +42,51 @@
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",
     "mongodb": "^3.3.3",
-    "node-sass": "^4.12.0",
     "popper.js": "^1.16.0",
-    "sass-loader": "^8.0.0",
-    "sc-errors": "~2.0.1",
     "sc-hot-reboot": "~1.0.0",
-    "scc-broker-client": "~6.1.0",
     "serve-static": "^1.14.1",
     "socketcluster": "^14.4.1",
     "socketcluster-client": "^14.3.1",
     "split.js": "^1.5.11",
-    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.41.2",
     "webpack-cleanup-plugin": "^0.5.1",
-    "webpack-cli": "^3.3.9",
     "ws": "^7.2.0"
   },
-  "scripts": {
-    "build": "build-if-changed",
-    "webpack": "webpack",
-    "start": "./server.js",
-    "start:debug": "./server.js --debug",
-    "start:docker": "node dockerwait.js && node ${SOCKETCLUSTER_MASTER_CONTROLLER:-server.js}"
+  "devDependencies": {
+    "cross-conf-env": "^1.1.2",
+    "css-loader": "^3.2.0",
+    "depcheck": "^0.8.4",
+    "eslint": "^6.6.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "expose-loader": "^0.7.5",
+    "node-sass": "^4.13.0",
+    "sass-loader": "^8.0.0",
+    "webpack-cli": "^3.3.9"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "browser": true
+    },
+    "globals": {
+      "$": "readonly"
+    },
+    "extends": [
+      "eslint:recommended",
+      "standard"
+    ],
+    "rules": {
+      "require-atomic-updates": "off",
+      "no-empty": [
+        "error",
+        {
+          "allowEmptyCatch": true
+        }
+      ]
+    }
   }
 }

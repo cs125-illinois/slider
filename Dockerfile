@@ -1,15 +1,16 @@
-FROM node:8-slim
+FROM mhart/alpine-node:12.13.0
 
-LABEL maintainer="Jonathan Gros-Dubois"
-LABEL version="9.3.1"
-LABEL description="Docker file for SocketCluster with support for clustering."
+WORKDIR /app
+RUN apk add --no-cache --virtual .gyp python make g++
+COPY package*.json ./
+COPY config.yaml server.js worker.js webpack.config.js ./
+COPY client/ ./client/
+RUN npm i && npm run webpack
+RUN apk del .gyp
 
-RUN mkdir -p /usr/src/
-WORKDIR /usr/src/
-COPY . /usr/src/
+RUN apk add --no-cache --virtual tini
 
-RUN npm install .
+EXPOSE 3088
 
-EXPOSE 8000
-
-CMD ["npm", "run", "start:docker"]
+ENTRYPOINT [ "/sbin/tini", "--"]
+CMD [ "node", "server.js" ]

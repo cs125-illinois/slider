@@ -12,22 +12,11 @@ const mongo = require('mongodb').MongoClient
 const expect = require('chai').expect
 const bunyan = require('bunyan')
 const moment = require('moment-timezone')
-const log = bunyan.createLogger({
-  name: 'slider',
-  streams: [
-    {
-      type: 'rotating-file',
-      path: 'logs/slider.log',
-      period: '1d',
-      count: 365,
-      level: 'info'
-    }
-  ]
-})
+const log = bunyan.createLogger({ name: 'slider' })
 
 const config = _.extend(
   require('minimist')(process.argv.slice(2)),
-  jsYAML.safeLoad(fs.readFileSync('config.yaml', 'utf8')),
+  jsYAML.safeLoad(fs.readFileSync('config.yaml', 'utf8'))
 )
 
 const semesters = _.mapValues(config.semesters, semester => {
@@ -37,42 +26,43 @@ const semesters = _.mapValues(config.semesters, semester => {
   }
 })
 
-function getCurrentSemester() {
+function getCurrentSemester () {
   const now = moment()
   return _.findKey(semesters, ({ start, end }) => {
     return now.isBetween(start, end, null, '[]')
   })
 }
 
-let PrettyStream = require('bunyan-prettystream')
-let prettyStream = new PrettyStream()
+const PrettyStream = require('bunyan-prettystream')
+const prettyStream = new PrettyStream()
 prettyStream.pipe(process.stdout)
 if (config.debug) {
   log.addStream({
     type: 'raw',
     stream: prettyStream,
-    level: "debug"
+    level: 'debug'
   })
 } else {
   log.addStream({
     type: 'raw',
     stream: prettyStream,
-    level: "warn"
+    level: 'warn'
   })
 }
 
 const { OAuth2Client } = require('google-auth-library')
-var client = new OAuth2Client(process.env.GOOGLE, '', '');
+var client = new OAuth2Client(process.env.GOOGLE, '', '')
 
 const fileWatcher = require('filewatcher')
 const distWatcher = fileWatcher()
 
 class Slider extends SocketWorker {
-  constructor(db) {
+  constructor (db) {
     super()
     this.db = db
     this.sliderChanges = db.collection('sliderChanges')
   }
+
   async login (info, respond, socket) {
     try {
       var login = await client.verifyIdToken({
@@ -80,11 +70,11 @@ class Slider extends SocketWorker {
         audience: process.env.GOOGLE
       })
     } catch (err) {
-      log.warn(`login failed: ${ err }`)
+      log.warn(`login failed: ${err}`)
       return respond('login failed')
     }
     try {
-      let payload = login.getPayload()
+      const payload = login.getPayload()
       expect(payload.hd).to.equal('illinois.edu')
       socket.setAuthToken({
         email: payload.email,
@@ -92,14 +82,15 @@ class Slider extends SocketWorker {
       })
       return respond()
     } catch (err) {
-      log.warn(`login failed ${ err }`)
+      log.warn(`login failed ${err}`)
       return respond('Please log in with your @illinois.edu email address')
     }
   }
-  async reporter(currentSlide, respond, socket) {
-    let authToken = socket.getAuthToken()
+
+  async reporter (currentSlide, respond, socket) {
+    const authToken = socket.getAuthToken()
     if (!(authToken)) {
-      log.warn(`authentication required`)
+      log.warn('authentication required')
       return respond('authentication required')
     }
 
@@ -120,14 +111,15 @@ class Slider extends SocketWorker {
 
     return respond()
   }
+
   async run () {
-    let app = express()
+    const app = express()
     let mapping = {}
-    let loadMapping = () => {
+    const loadMapping = () => {
       mapping = {}
       _.each(fs.readdirSync(path.resolve(__dirname, 'dist')), filename => {
-        let components = filename.split('.')
-        mapping[`${ components[0] }.${ components[2] }`] = filename
+        const components = filename.split('.')
+        mapping[`${components[0]}.${components[2]}`] = filename
       })
     }
     loadMapping()
@@ -137,14 +129,13 @@ class Slider extends SocketWorker {
       loadMapping()
     })
     app.use((req, res, next) => {
-      let url = req.url.split("/").slice(1).join("/")
+      const url = req.url.split('/').slice(1).join('/')
       if (url in mapping) {
         req.url = mapping[url]
       }
       return next()
     })
-    app.use(serveStatic(path.resolve(__dirname, 'dist')));
-    app.use(serveStatic(path.resolve(__dirname, 'public')));
+    app.use(serveStatic(path.resolve(__dirname, 'dist')))
     this.httpServer.on('request', app)
 
     this.scServer.on('connection', (socket) => {
@@ -160,5 +151,5 @@ class Slider extends SocketWorker {
 
 mongo.connect(process.env.MONGO, { useUnifiedTopology: true })
   .then(client => {
-    new Slider(client.db('cs125'))
+    new Slider(client.db('cs125')) // eslint-disable-line
   })
