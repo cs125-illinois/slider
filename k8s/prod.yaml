@@ -15,8 +15,6 @@ spec:
     spec:
       containers:
       - name: slider
-        command: [ "/bin/sh" ]
-        args: [ "-c", "tail -f /dev/null" ]
         image: cs125/slider:2019.10.1
         imagePullPolicy: Always
         ports:
