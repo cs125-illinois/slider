@@ -129,7 +129,7 @@ module.exports.from = (opts, plugins) => {
     link.setAttribute('href', $(parent).attr('data-slider'))
 
     deck.socket = socketCluster.connect({
-      path: '/slider/',
+      path: link.pathname,
       hostname: link.hostname,
       port: link.port,
       secure: (link.port === 443 || link.protocol === 'https:')

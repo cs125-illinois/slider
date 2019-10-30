@@ -20,7 +20,7 @@ spec:
         image: cs125/slider:2019.10.1
         imagePullPolicy: Always
         ports:
-        - containerPort: 3088
+        - containerPort: 8000
         env:
         - name: TZ
           value: "America/Chicago"
@@ -37,33 +37,27 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-service
-  namespace: app
+  name: slider-service
+  namespace: slider
 spec:
   type: NodePort
   ports:
   - name: http
     port: 80
-    targetPort: 3088
+    targetPort: 8000
   selector:
-    app: app
+    app: slider
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  namespace: app
+  namespace: slider
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/proxy-redirect-from: /
     nginx.ingress.kubernetes.io/proxy-redirect-to: /slider/
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/affinity: cookie
-    nginx.ingress.kubernetes.io/affinity-mode: balanced
-    nginx.ingress.kubernetes.io/session-cookie-path: "slider"
-    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
-    nginx.ingress.kubernetes.io/session-cookie-expires: "3600"
-    nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
-  name: app-ingress
+  name: slider-ingress
 spec:
   rules:
   - http:

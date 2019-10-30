@@ -7,7 +7,7 @@
     "build": "build-if-changed",
     "webpack": "webpack",
     "docker:build": "cross-conf-env docker build . -t cs125/slider:$npm_package_version",
-    "post:dockerbuild": "npm run docker:tag",
+    "postdocker:build": "npm run docker:tag",
     "docker:tag": "cross-conf-env docker tag cs125/slider:$npm_package_version cs125/slider:latest",
     "docker:push": "cross-conf-env docker push cs125/slider:$npm_package_version && cross-conf-env docker push cs125/slider:latest",
     "start": "node server.js --debug"
