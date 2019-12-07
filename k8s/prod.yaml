@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: slider
-        image: cs125/slider:2019.10.1
+        image: cs125/slider:2019.12.1
         imagePullPolicy: Always
         ports:
         - containerPort: 8000

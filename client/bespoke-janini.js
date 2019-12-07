@@ -66,7 +66,7 @@ module.exports = () => {
       source = source.getValue() + '\n'
       const job = {
         label: `slider:${deck.id}:${active.slideID || '(?)'}`,
-        tasks: ['execute'],
+        tasks: ['compile', 'execute'],
         arguments: {
           checkstyle: {
             failOnError: true
