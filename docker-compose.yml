@@ -12,7 +12,9 @@ services:
     networks:
       - slider
     environment:
+      - "HTTP=http://0.0.0.0:8888"
       - "MONGODB=mongodb://mongodb/cs125"
+      - AUTH_GOOGLE_CLIENTID
   mongodb:
     image: "bitnami/mongodb:4.0"
     ports:

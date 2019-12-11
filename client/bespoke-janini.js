@@ -64,9 +64,9 @@ module.exports = () => {
       }
 
       source = source.getValue() + '\n'
+      const tasks = { execute: true, checkstyle: true }
       const job = {
         label: `slider:${deck.id}:${active.slideID || '(?)'}`,
-        tasks: ['compile', 'execute'],
         arguments: {
           checkstyle: {
             failOnError: true
@@ -74,13 +74,21 @@ module.exports = () => {
         }
       }
       if (!($(active.slide).hasClass('nocheckstyle'))) {
-        job.tasks.unshift('checkstyle')
+        delete(tasks.checkstyle)
       }
       if ($(active.slide).hasClass('compiler')) {
+        tasks.compile = true
         job.sources = [{ path: 'Example.java', contents: source }]
         job.arguments.execution = {
           klass: 'Example',
           method: 'main(String[])'
+        }
+      } else if ($(active.slide).hasClass('kompiler')) {
+        tasks.kompile = true
+        job.sources = [{ path: 'Main.kt', contents: source }]
+        job.arguments.execution = {
+          klass: 'MainKt',
+          method: 'main()'
         }
       } else {
         job.snippet = source
@@ -88,6 +96,7 @@ module.exports = () => {
           indent: 2
         }
       }
+      job.tasks = _.keys(tasks)
       console.debug(job)
       if (token) {
         job.authToken = token
@@ -189,8 +198,9 @@ ${errorCount} error${errorCount > 1 ? 's' : ''}`
     const janinis = {}
     _.each(deck.slides, (slide, i) => {
       $(slide).find('textarea.janini').each((unused, editor) => {
+        const kotlin = console.log($(editor).parent().hasClass('kompiler'))
         janinis[i] = CodeMirror.fromTextArea($(editor).get(0), {
-          mode: 'text/x-java',
+          mode: kotlin ? 'text/x-kotlin' : 'text/x-java',
           lineNumbers: true,
           matchBrackets: true,
           lineWrapping: true
