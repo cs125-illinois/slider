@@ -198,7 +198,7 @@ ${errorCount} error${errorCount > 1 ? 's' : ''}`
     const janinis = {}
     _.each(deck.slides, (slide, i) => {
       $(slide).find('textarea.janini').each((unused, editor) => {
-        const kotlin = console.log($(editor).parent().hasClass('kompiler'))
+        const kotlin = $(editor).parent().hasClass('kompiler')
         janinis[i] = CodeMirror.fromTextArea($(editor).get(0), {
           mode: kotlin ? 'text/x-kotlin' : 'text/x-java',
           lineNumbers: true,
