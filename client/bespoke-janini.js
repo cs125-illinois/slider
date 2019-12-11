@@ -124,8 +124,8 @@ ${new Array(column).join(' ')}^`
           const errorCount = Object.keys(errors).length
           resultOutput += `
 ${errorCount} error${errorCount > 1 ? 's' : ''}`
-        } else if (result.failed.compilation) {
-          const { errors } = result.failed.compilation
+        } else if (result.failed.compilation || result.failed.kompilation) {
+          const { errors } = result.failed.compilation || result.failed.kompilation
           resultOutput += errors.map(error => {
             const { source, line, column } = error.location
             const originalLine = source === ''
