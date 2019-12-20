@@ -73,7 +73,7 @@ module.exports = () => {
           }
         }
       }
-      if (!($(active.slide).hasClass('nocheckstyle'))) {
+      if ($(active.slide).hasClass('nocheckstyle')) {
         delete(tasks.checkstyle)
       }
       if ($(active.slide).hasClass('compiler')) {
@@ -84,6 +84,7 @@ module.exports = () => {
           method: 'main(String[])'
         }
       } else if ($(active.slide).hasClass('kompiler')) {
+        delete(tasks.checkstyle)
         tasks.kompile = true
         job.sources = [{ path: 'Main.kt', contents: source }]
         job.arguments.execution = {
@@ -91,6 +92,7 @@ module.exports = () => {
           method: 'main()'
         }
       } else {
+        tasks.compile = true
         job.snippet = source
         job.arguments.snippet = {
           indent: 2
