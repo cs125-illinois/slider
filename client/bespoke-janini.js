@@ -173,18 +173,19 @@ ${errorCount} error${errorCount > 1 ? 's' : ''}`
         if (Object.keys(result.failed).length === 0) {
           if (result.completed.execution) {
             const { execution } = result.completed
-            resultOutput += execution.outputLines.map(outputLine => {
+            const executionLines = execution.outputLines.map(outputLine => {
               return outputLine.line
-            }).join('\n')
+            })
             if (execution.timeout) {
-              resultOutput += '\n(Program Timed Out)'
+              executionLines.push("(Program Timed Out)")
             }
             if (execution.truncatedLines > 0) {
-              resultOutput += `\n(${execution.truncatedLines} lines were truncated)`
+              executionLines.push(`(${execution.truncatedLines} lines were truncated)`)
             }
+            resultOutput += executionLines.join("\n")
           }
         }
-        $(output).text(resultOutput)
+        $(output).text(resultOutput.trim())
       }).fail((xhr, status, error) => {
         console.error('Request failed')
         console.error(JSON.stringify(xhr, null, 2))
