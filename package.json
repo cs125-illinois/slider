@@ -2,7 +2,10 @@
   "name": "slider",
   "private": true,
   "scripts": {
+    "start": "concurrently -n backend,slider \"npm run backend\" \"npm run develop\"",
+    "poststart": "docker-compose down",
     "depcheck": "depcheck --ignores=css-loader,expose-loader,node-sass,sass-loader,webpack-cli,ws",
+    "backend": "docker-compose up 1> /dev/null",
     "eslint": "eslint server.js worker.js client/*.js --fix",
     "build": "build-if-changed",
     "webpack": "webpack",
@@ -10,7 +13,7 @@
     "postdocker:build": "npm run docker:tag",
     "docker:tag": "cross-conf-env docker tag cs125/slider:$npm_package_version cs125/slider:latest",
     "docker:push": "cross-conf-env docker push cs125/slider:$npm_package_version && cross-conf-env docker push cs125/slider:latest",
-    "start": "node server.js --debug"
+    "develop": "node server.js --debug"
   },
   "dependencies": {
     "bespoke": "^1.1.0",
@@ -52,6 +55,7 @@
     "ws": "^7.2.1"
   },
   "devDependencies": {
+    "concurrently": "^5.1.0",
     "cross-conf-env": "^1.1.2",
     "css-loader": "^3.4.2",
     "depcheck": "^0.9.1",
