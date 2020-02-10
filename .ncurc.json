@@ -1,5 +1,7 @@
 {
   "reject": [
-    "build-if-changed"
+    "build-if-changed",
+    "socketcluster",
+    "socketcluster-client"
   ]
 }
