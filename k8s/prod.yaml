@@ -58,7 +58,8 @@ metadata:
   name: slider-ingress
 spec:
   rules:
-  - http:
+  - host: cs125-cloud.cs.illinois.edu
+    http:
       paths:
       - path: /slider(/|$)(.*)
         backend:
