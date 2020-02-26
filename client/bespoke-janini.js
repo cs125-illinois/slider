@@ -28,6 +28,8 @@ module.exports = () => {
         type: 'POST',
         data: JSON.stringify({ authToken: token }),
         contentType: 'application/json; charset=utf-8',
+        xhrFields: { withCredentials: true },
+        crossDomain: true,
         dataType: 'json'
       }).done(result => {
         console.debug("Preauthentication completed")
@@ -120,6 +122,8 @@ module.exports = () => {
         type: 'POST',
         data: JSON.stringify(job),
         contentType: 'application/json; charset=utf-8',
+        xhrFields: { withCredentials: true },
+        crossDomain: true,
         dataType: 'json'
       }).done(result => {
         console.debug(result)
