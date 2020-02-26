@@ -21,7 +21,18 @@ module.exports = () => {
     })
 
     let token
-    deck.on('token', t => { token = t })
+    deck.on('token', t => {
+      token = t
+      $.ajax({
+        url: process.env.JEED + "/auth",
+        type: 'POST',
+        data: JSON.stringify({ authToken: token }),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json'
+      }).done(result => {
+        console.debug("Preauthentication completed")
+      })
+    })
 
     /*
      * Refreshing the editor causes it to immediately respond to font changes.
