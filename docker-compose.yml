@@ -12,6 +12,7 @@ services:
     networks:
       - slider
     environment:
+      - "HOSTS=http://localhost:8125"
       - "SEMESTER=Spring2020"
       - "HTTP=http://0.0.0.0:8888"
       - "MONGODB=mongodb://mongodb/cs125"
