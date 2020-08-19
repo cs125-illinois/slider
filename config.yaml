@@ -15,3 +15,6 @@ semesters:
   Spring2020:
     start: 01-20-2020
     end: 05-06-2020
+  Fall2020:
+    start: 08-24-2020
+    end: 12-18-2020
